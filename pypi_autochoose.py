@@ -1,12 +1,24 @@
-
 import subprocess
+import sys
 import time
-import requests
-import concurrent.futures
 import os
 import json
 import locale
 from datetime import datetime, timedelta
+
+def install_package(*packages):
+    for package in packages:
+        try:
+            __import__(package)
+        except ImportError:
+            print(f"Installing {package}...")
+            subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+
+# 安装所需的包
+install_package("requests", "rich")
+
+# 现在可以安全地导入这些包
+import requests
 from rich.console import Console
 from rich.table import Table
 from rich.progress import Progress, SpinnerColumn, BarColumn, TextColumn
@@ -15,9 +27,9 @@ from rich.panel import Panel
 # 根据系统语言选择语言文件
 system_language = locale.getdefaultlocale()[0]
 if system_language.startswith('zh'):
-    from .lang_zh import MESSAGES, MIRRORS
+    from lang_zh import MESSAGES, MIRRORS
 else:
-    from .lang_en import MESSAGES, MIRRORS
+    from lang_en import MESSAGES, MIRRORS
 
 console = Console()
 
@@ -151,7 +163,6 @@ def main():
             console.print(f"[yellow]{MESSAGES['check_permissions']}[/yellow]")
     else:
         console.print(f"[bold red]{MESSAGES['all_unreachable']}[/bold red]")
-
 
 if __name__ == "__main__":
     main()
